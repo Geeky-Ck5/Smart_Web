@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">AirMonitor</div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/reports">Reports</a>
+            <a href="/blockchain">Blockchain</a>
+            <a href="/weather">Weather</a>
+            <a href="/admin">Admin Panel</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Admin Panel - User Management</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.user_type }}</td>
+                    <td>{{ "Active" if user.is_active else "Inactive" }}</td>
+                    <td>
+                        <form action="/toggle_user_status" method="post">
+                            <input type="hidden" name="email" value="{{ user.email }}">
+                            <button type="submit">{{ "Deactivate" if user.is_active else "Activate" }}</button>
+                        </form>
+                        <form action="/change_user_role" method="post">
+                            <input type="hidden" name="email" value="{{ user.email }}">
+                            <select name="new_role">
+                                <option value="admin">Admin</option>
+                                <option value="home_user">Home User</option>
+                                <option value="kid_user">Kid User</option>
+                            </select>
+                            <button type="submit">Change Role</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

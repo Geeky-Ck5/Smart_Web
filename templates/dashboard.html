@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-logo">AirMonitor</div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/reports">Reports</a>
+            <a href="/blockchain">Blockchain</a>
+            <a href="/weather">Weather</a>
+            {% if user_role == "admin" %}
+                <a href="/admin">Admin Panel</a>
+            {% endif %}
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Welcome to the Dashboard</h2>
+        <p>Role: <strong>{{ user_role }}</strong></p>
+
+        <!-- Real-time Pollution Data -->
+        <h3>Real-Time Air Pollution Data</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>PM2.5</th>
+                    <th>PM10</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in data %}
+                <tr>
+                    <td>{{ entry.timestamp }}</td>
+                    <td>{{ entry['PM2.5'] }}</td>
+                    <td>{{ entry['PM10'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Blockchain Data -->
+        <h3>Blockchain Records</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Block Index</th>
+                    <th>Timestamp</th>
+                    <th>PM2.5</th>
+                    <th>PM10</th>
+                    <th>Hash</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for block in blockchain_data %}
+                <tr>
+                    <td>{{ block.index }}</td>
+                    <td>{{ block.timestamp }}</td>
+                    <td>{{ block.data['PM2.5'] }}</td>
+                    <td>{{ block.data['PM10'] }}</td>
+                    <td>{{ block.hash[:10] }}...</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

@@ -1,28 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Pollution Monitoring</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>Air Pollution Data</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>PM2.5</th>
-                <th>PM10</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in data %}
-            <tr>
-                <td>{{ entry.timestamp }}</td>
-                <td>{{ entry['PM2.5'] }}</td>
-                <td>{{ entry['PM10'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-logo">AirMonitor</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/register">Register</a>
+            <a href="/login">Login</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="left-side">
+            <img src="/static/images/air_quality.jpg" alt="Air Pollution Monitoring">
+        </div>
+
+        <div class="right-side">
+            <h2>Login</h2>
+            <form action="/login" method="post">
+                <label>Email:</label>
+                <input type="email" name="email" required>
+
+                <label>Password:</label>
+                <input type="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="/register">Register here</a></p>
+        </div>
+    </div>
 </body>
 </html>
