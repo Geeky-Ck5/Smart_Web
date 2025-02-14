@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import datetime
 
 def get_db():
     client = MongoClient("mongodb://localhost:27017/")
@@ -11,6 +11,7 @@ def get_db():
 ### 1. Storing Air Pollution Data ###
 def store_sensor_data(data):
     db = get_db()
+    data["timestamp"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")  # Ensure dynamic timestamps
     db.pollution_data.insert_one(data)
 
 
@@ -35,15 +36,17 @@ def register_user(email, password, user_type):
 
     user_data = {
         "email": email,
-        "password": hashed_password,  # Securely hashed password
-        "user_type": user_type  # Values: admin, home_user, kid_user
+        "password": hashed_password,
+        "user_type": user_type,
+        "is_active": False  # Users are inactive until admin activates them
     }
 
     try:
         users_collection.insert_one(user_data)
-        return True, "User registered successfully"
+        return True, "User registered successfully. Please wait for admin approval."
     except Exception as e:
         return False, f"Error: {e}"
+
 
 
 ### 4. Authenticating a User ###
@@ -54,6 +57,15 @@ def authenticate_user(email, password):
     user = users_collection.find_one({"email": email})
 
     if user and check_password_hash(user["password"], password):
+        if not user["is_active"]:
+            return False, "inactive"  # Prevent login for inactive users
         return True, user["user_type"]
 
     return False, None
+
+### 5. Storing Blockchain data ###
+
+def create_blockchain_collection():
+    db = get_db()
+    if "blockchain" not in db.list_collection_names():
+        db.create_collection("blockchain")

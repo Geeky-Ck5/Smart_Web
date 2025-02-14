@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Data</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">AirMonitor</div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/reports">Reports</a>
+            <a href="/blockchain">Blockchain</a>
+            <a href="/weather">Weather</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Blockchain Records</h2>
+        <table class="blockchain-table">
+            <thead>
+                <tr>
+                    <th>Block Index</th>
+                    <th>Timestamp</th>
+                    <th>PM2.5</th>
+                    <th>PM10</th>
+                    <th>Hash</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for block in blockchain_data %}
+                <tr>
+                    <td>{{ block.index }}</td>
+                    <td>{{ block.timestamp }}</td>
+                    <td>{{ block.data['PM2.5'] }}</td>
+                    <td>{{ block.data['PM10'] }}</td>
+                    <td>{{ block.hash[:10] }}...</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

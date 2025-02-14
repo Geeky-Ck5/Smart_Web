@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <!-- Navigation Bar -->
     <nav>
         <div class="nav-logo">AirMonitor</div>
         <div class="nav-links">
@@ -16,63 +17,80 @@
             <a href="/reports">Reports</a>
             <a href="/blockchain">Blockchain</a>
             <a href="/weather">Weather</a>
-            {% if user_role == "admin" %}
-                <a href="/admin">Admin Panel</a>
-            {% endif %}
+            <a href="/admin">Admin Panel</a>
             <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
 
-    <div class="container">
-        <h2>Welcome to the Dashboard</h2>
-        <p>Role: <strong>{{ user_role }}</strong></p>
+    <div class="dashboard-container">
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card">Total Pollution Data: {{ total_pollution }}</div>
+            <div class="card">Total Blockchain Records: {{ total_blocks }}</div>
+            <div class="card">PM2.5 Above Threshold: {{ pm25_threshold_count }}</div>
+            <div class="card">PM10 Above Threshold: {{ pm10_threshold_count }}</div>
+            <div class="card">Actuator Activations: {{ actuator_count }}</div>
+        </div>
+<!-- Highest PM2.5 & PM10 Card -->
+<div class="highest-card">
+    <strong>Highest PM2.5:</strong> {{ highest_pm25 }}
+    {% if highest_pm25 != "No Data" %} (Recorded on: {{ highest_pm25_timestamp }}) {% endif %} |
 
-        <!-- Real-time Pollution Data -->
-        <h3>Real-Time Air Pollution Data</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>PM2.5</th>
-                    <th>PM10</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in data %}
-                <tr>
-                    <td>{{ entry.timestamp }}</td>
-                    <td>{{ entry['PM2.5'] }}</td>
-                    <td>{{ entry['PM10'] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <strong>Highest PM10:</strong> {{ highest_pm10 }}
+    {% if highest_pm10 != "No Data" %} (Recorded on: {{ highest_pm10_timestamp }}) {% endif %}
+</div>
 
-        <!-- Blockchain Data -->
-        <h3>Blockchain Records</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Block Index</th>
-                    <th>Timestamp</th>
-                    <th>PM2.5</th>
-                    <th>PM10</th>
-                    <th>Hash</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for block in blockchain_data %}
-                <tr>
-                    <td>{{ block.index }}</td>
-                    <td>{{ block.timestamp }}</td>
-                    <td>{{ block.data['PM2.5'] }}</td>
-                    <td>{{ block.data['PM10'] }}</td>
-                    <td>{{ block.hash[:10] }}...</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
+        <!-- Data Tables Side by Side -->
+        <div class="data-section">
+            <div class="table-container">
+                <h2>Real-Time Air Pollution Data</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>PM2.5</th>
+                            <th>PM10</th>
+                        </tr>
+                    </thead>
+         <tbody id="pollution-table">
+    {% for entry in data %}
+    <tr>
+        <td>{{ entry.timestamp }}</td> <!-- Now showing full timestamp -->
+        <td class="{% if entry['PM2.5'] > 100 %}red{% elif entry['PM2.5'] > 80 %}orange{% else %}green{% endif %}">
+            {{ entry['PM2.5'] }}
+        </td>
+        <td class="{% if entry['PM10'] > 150 %}red{% elif entry['PM10'] > 120 %}orange{% else %}green{% endif %}">
+            {{ entry['PM10'] }}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <h2>Blockchain Records</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>Timestamp</th>
+                            <th>Hash</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blockchain-table">
+                        {% for block in blockchain_data %}
+                        <tr>
+                            <td>{{ block.index }}</td>
+                            <td>{{ block.timestamp }}</td>
+                            <td>{{ block.hash[:10] }}...</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 </body>

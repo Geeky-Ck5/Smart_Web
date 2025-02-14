@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pollution Reports</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">AirMonitor</div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/reports">Reports</a>
+            <a href="/blockchain">Blockchain</a>
+            <a href="/weather">Weather</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Historical Air Pollution Reports</h2>
+
+        <!-- Date Filter -->
+        <form action="/reports" method="GET">
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" required>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" required>
+
+            <button type="submit">Filter</button>
+        </form>
+
+        <!-- Chart -->
+        <h3>Air Pollution Levels</h3>
+        <canvas id="pollutionChart"></canvas>
+
+        <!-- Historical Data Table -->
+        <h3>Pollution Data</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>PM2.5</th>
+                    <th>PM10</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in data %}
+                <tr>
+                    <td>{{ entry.timestamp }}</td>
+                    <td>{{ entry['PM2.5'] }}</td>
+                    <td>{{ entry['PM10'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+  <script>
+    var ctx = document.getElementById("pollutionChart").getContext("2d");
+
+    var chartData = {
+        labels: {{ timestamps | tojson }},
+        datasets: [
+            {
+                label: "PM2.5",
+                data: {{ pm25_values | tojson }},
+                borderColor: "red",
+                fill: false
+            },
+            {
+                label: "PM10",
+                data: {{ pm10_values | tojson }},
+                borderColor: "blue",
+                fill: false
+            }
+        ]
+    };
+
+    new Chart(ctx, {
+        type: "line",
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        parser: "YYYY-MM-DDTHH:mm:ssZ",
+                        unit: 'day'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
