@@ -123,3 +123,59 @@ td {
     color: black;
     font-weight: bold;
 }
+
+.bot-config {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+    width: 300px;
+}
+
+.bot-config h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.bot-config input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.bot-config button {
+    width: 100%;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-blue {
+    background-color: #007bff;
+}
+
+.btn-blue:hover {
+    background-color: #0056b3;
+}
+
+.btn-red {
+    background-color: #dc3545;
+}
+
+.btn-red:hover {
+    background-color: #a71d2a;
+}
+
+.btn-green {
+    background-color: #28a745;
+}
+
+.btn-green:hover {
+    background-color: #1e7e34;
+}

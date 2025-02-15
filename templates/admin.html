@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="/static/admin.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+        <script>
+        function logout() {
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message); // Log API response
+                window.location.href = "/"; // Redirect to homepage after logout
+            })
+            .catch(error => console.error("Logout failed:", error));
+        }
+
+        // Auto-refresh every 30 seconds
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
 </head>
 <body>
 
@@ -14,7 +33,7 @@
         <div class="nav-logo">Admin Dashboard</div>
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
-            <a href="/logout" class="logout-btn">Logout</a>
+               <a href="#" onclick="logout()" class="logout-btn">Logout</a>
         </div>
     </nav>
 
@@ -121,9 +140,38 @@
             {% endif %}
         </tbody>
     </table>
+
+            <!-- Bot Configuration -->
+<div class="bot-config">
+    <h2>Configure Bot Sleep Time</h2>
+    <form id="bot-config-form">
+        <label for="sleep_time">Set Bot Sleep Time (seconds):</label>
+        <input type="number" id="sleep_time" name="sleep_time" min="1" required>
+        <button type="submit" class="btn-blue">Update</button>
+    </form>
 </div>
 
+<script>
+document.getElementById("bot-config-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const sleepTime = document.getElementById("sleep_time").value;
+
+    const response = await fetch("/api/set_bot_sleep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sleep_time: parseInt(sleepTime) })
+    });
+
+    const result = await response.json();
+    alert(result.message || result.error);
+});
+</script>
+
+
     </div>
+
+</div>
+
 
 </body>
 </html>

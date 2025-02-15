@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify, request, redirect, session, flash
 from apscheduler.schedulers.background import BackgroundScheduler
-import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from functools import wraps
@@ -8,10 +7,14 @@ from db.mongodb import store_sensor_data, register_user_api, authenticate_user, 
 from blockchain.blockchain import Blockchain
 import datetime
 import os
+import requests
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Generate a new secret key every restart (forces session reset)
 app.config['SESSION_PERMANENT'] = False  # Ensure sessions expire when the app closes
+
+BOT_SLEEP_TIME=5
 
 blockchain = Blockchain()
 air_pollution_data = []  # Stores real-time pollution data
@@ -57,11 +60,6 @@ def fetch_sensor_data():
 
     # Store in Blockchain
     blockchain.add_block(data)
-
-    # Check threshold and trigger actuator if needed
-    if data["PM2.5"] > 100:
-        activate_actuator()
-
 
 ### Activate Actuator API ###
 @app.route("/activate_actuator", methods=["POST"])
@@ -336,6 +334,52 @@ def login():
 @app.route("/index")
 def index_redirect():
     return redirect("/")
+
+#BOT API
+@app.route("/api/set_bot_sleep", methods=["POST"])
+def set_bot_sleep():
+    """Allows the admin to update the bot's sleep interval."""
+    if "user_type" not in session or session["user_type"] != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json
+    new_sleep_time = data.get("sleep_time")
+
+    if not isinstance(new_sleep_time, int) or new_sleep_time <= 0:
+        return jsonify({"error": "Invalid sleep time"}), 400
+
+    db = get_db()
+    db.config.update_one({"name": "bot_settings"}, {"$set": {"sleep_time": new_sleep_time}}, upsert=True)
+
+    return jsonify({"message": f"Bot sleep time updated to {new_sleep_time} seconds"}), 200
+
+@app.route("/api/get_bot_sleep", methods=["GET"])
+def get_bot_sleep():
+    """Returns the current bot sleep time."""
+    db = get_db()
+    config = db.config.find_one({"name": "bot_settings"}, {"_id": 0, "sleep_time": 1})
+    return jsonify({"sleep_time": config["sleep_time"] if config else BOT_SLEEP_TIME})
+
+
+
+@app.route("/admin_activate_actuator", methods=["POST"])
+def admin_activate_actuator():
+    """Allows an admin to manually activate the actuator if PM10 is in amber range."""
+    if "user_type" not in session or session["user_type"] != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    pm10_value = float(request.form.get("pm10_value", 0))
+    timestamp = request.form.get("timestamp", "")
+
+    if 120 <= pm10_value <= 150:
+        try:
+            response = requests.post("http://127.0.0.1:5002/actuator", json={"PM10": pm10_value, "manual": True})
+            return redirect("/admin")  # Redirect to Admin Panel after activation
+        except requests.exceptions.RequestException as e:
+            return f"Error triggering actuator: {e}", 500
+    else:
+        return jsonify({"error": "PM10 value is not in the amber range (80-100)."}), 400
+
 
 ### Run Flask App ###
 if __name__ == "__main__":

@@ -2,16 +2,23 @@ from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
-def get_db():
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["air_pollution"]
-    return db
 
+#CLOUD
+MONGO_URI = "mongodb+srv://mytkavish:mytkavish@cluster0.z8s2k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+client = MongoClient(MONGO_URI)
+db = client["air_pollution_db"]
+
+#LOCALDB
+def get_db():
+    #client = MongoClient("mongodb://localhost:27017/")
+   # db = client["air_pollution"]
+    return client["air_pollution_db"]
 
 ### 1. Storing Air Pollution Data ###
 def store_sensor_data(data):
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client.air_pollution
+   # client = MongoClient("mongodb://localhost:27017/")  # ❌ Still using local MongoDB
+    #db = client.air_pollution
+    db = get_db()
 
     # Fix: Ensure PM2.5 is stored without quotes
     data["timestamp"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
