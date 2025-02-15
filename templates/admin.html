@@ -3,59 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/admin.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 </head>
 <body>
 
     <nav>
-        <div class="nav-logo">AirMonitor</div>
+        <div class="nav-logo">Admin Dashboard</div>
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
-            <a href="/reports">Reports</a>
-            <a href="/blockchain">Blockchain</a>
-            <a href="/weather">Weather</a>
-            <a href="/admin">Admin Panel</a>
             <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
 
-    <div class="container">
-        <h2>Admin Panel - User Management</h2>
-        <table>
-            <thead>
+    <div class="admin-container">
+        <!-- Left Side: User Management -->
+        <div class="user-management">
+            <h2>Admin Panel - User Management</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.user_type }}</td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="status-active">Active</span>
+                            {% else %}
+                                <span class="status-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="/toggle_user_status" method="POST">
+                                <input type="hidden" name="email" value="{{ user.email }}">
+                                {% if user.is_active %}
+                                    <button type="submit" class="btn-red">Deactivate</button>
+                                {% else %}
+                                    <button type="submit" class="btn-green">Activate</button>
+                                {% endif %}
+                            </form>
+
+                            <form action="/change_user_role" method="POST">
+                                <input type="hidden" name="email" value="{{ user.email }}">
+                                <select name="new_role">
+                                    <option value="admin" {% if user.user_type == "admin" %}selected{% endif %}>Admin</option>
+                                    <option value="home_user" {% if user.user_type == "home_user" %}selected{% endif %}>Home User</option>
+                                    <option value="kid_user" {% if user.user_type == "kid_user" %}selected{% endif %}>Kid User</option>
+                                </select>
+                                <button type="submit" class="btn-blue">Change Role</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+       <!-- Right Side: Pollution Data -->
+<div class="pollution-management">
+    <h2>Real-Time Air Pollution Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>PM2.5</th>
+                <th>PM10</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if data %}
+                {% for entry in data %}
                 <tr>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.user_type }}</td>
-                    <td>{{ "Active" if user.is_active else "Inactive" }}</td>
+                    <td>{{ entry.timestamp }}</td>
+               <td class="
+    {% if entry['PM2.5'] > 100 %} red
+    {% elif entry['PM2.5'] > 80 %} amber
+    {% else %} green
+    {% endif %}
+">
+    {{ entry['PM2.5'] }}
+</td>
+
+<td class="
+    {% if entry['PM10'] > 150 %} red
+    {% elif entry['PM10'] > 120 %} amber
+    {% else %} green
+    {% endif %}
+">
+    {{ entry['PM10'] }}
+</td>
                     <td>
-                        <form action="/toggle_user_status" method="post">
-                            <input type="hidden" name="email" value="{{ user.email }}">
-                            <button type="submit">{{ "Deactivate" if user.is_active else "Activate" }}</button>
+                        {% if 120 <= entry['PM10'] <= 150 %}
+                        <form action="/admin_activate_actuator" method="POST">
+                            <input type="hidden" name="timestamp" value="{{ entry.timestamp }}">
+                            <input type="hidden" name="pm10_value" value="{{ entry['PM10'] }}">
+                            <button type="submit" class="btn-green">Activate</button>
                         </form>
-                        <form action="/change_user_role" method="post">
-                            <input type="hidden" name="email" value="{{ user.email }}">
-                            <select name="new_role">
-                                <option value="admin">Admin</option>
-                                <option value="home_user">Home User</option>
-                                <option value="kid_user">Kid User</option>
-                            </select>
-                            <button type="submit">Change Role</button>
-                        </form>
+                        {% else %}
+                        <span class="no-action">N/A</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
-            </tbody>
-        </table>
+            {% else %}
+                <tr><td colspan="4">No pollution data available.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
     </div>
 
 </body>

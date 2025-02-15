@@ -1,0 +1,125 @@
+/* Admin Panel Layout */
+.admin-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 30px; /* Space between the two sections */
+    padding: 20px;
+    align-items: start;
+}
+
+/* User Management Table */
+.user-management {
+    width: 100%;
+    padding: 15px;
+}
+
+/* Pollution Data Table */
+.pollution-management {
+    width: 100%;
+    padding: 15px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Buttons */
+.btn-green {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-red {
+    background-color: #d9534f;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-blue {
+    background-color: #0275d8;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Status Labels */
+.status-active {
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.status-inactive {
+    background-color: #d9534f;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Prevent Overlapping */
+.action-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Fix Timestamps from Overlapping */
+td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Actuator Activation Button */
+.activate-button {
+    background-color: #f0ad4e;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+}
+/* PM2.5 and PM10 Color Coding */
+.red {
+    background-color: #ff4d4d !important; /* Bright Red for Danger */
+    color: white;
+    font-weight: bold;
+}
+
+.amber {
+    background-color: #ffcc00 !important; /* Amber for Warning */
+    color: black;
+    font-weight: bold;
+}
+
+.green {
+    background-color: #66cc66 !important; /* Green for Safe */
+    color: black;
+    font-weight: bold;
+}

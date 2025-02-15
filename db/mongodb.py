@@ -10,8 +10,16 @@ def get_db():
 
 ### 1. Storing Air Pollution Data ###
 def store_sensor_data(data):
-    db = get_db()
-    data["timestamp"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")  # Ensure dynamic timestamps
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client.air_pollution
+
+    # Fix: Ensure PM2.5 is stored without quotes
+    data["timestamp"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    data["PM2.5"] = float(data.get("PM2.5", 0))  # Ensures correct field name
+    data["PM10"] = float(data.get("PM10", 0))
+
+    print("Storing Data:", data)  # Debugging output
+
     db.pollution_data.insert_one(data)
 
 
@@ -27,7 +35,7 @@ def create_users_collection():
 
 
 ### 3. Registering a New User ###
-def register_user(email, password, user_type):
+def register_user_api(email, password, user_type):
     db = get_db()
     users_collection = db["users"]
 

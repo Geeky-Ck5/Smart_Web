@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="/static/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function logout() {
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message); // Log API response
+                window.location.href = "/"; // Redirect to homepage after logout
+            })
+            .catch(error => console.error("Logout failed:", error));
+        }
+
+        // Auto-refresh every 30 seconds
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
 </head>
 <body>
 
@@ -17,8 +36,10 @@
             <a href="/reports">Reports</a>
             <a href="/blockchain">Blockchain</a>
             <a href="/weather">Weather</a>
-            <a href="/admin">Admin Panel</a>
-            <a href="/logout" class="logout-btn">Logout</a>
+            {% if session["user_type"] == "admin" %}
+                <a href="/admin">Admin Panel</a>
+            {% endif %}
+            <a href="#" onclick="logout()" class="logout-btn">Logout</a>
         </div>
     </nav>
 
@@ -27,19 +48,16 @@
         <div class="summary-cards">
             <div class="card">Total Pollution Data: {{ total_pollution }}</div>
             <div class="card">Total Blockchain Records: {{ total_blocks }}</div>
-            <div class="card">PM2.5 Above Threshold: {{ pm25_threshold_count }}</div>
-            <div class="card">PM10 Above Threshold: {{ pm10_threshold_count }}</div>
+              <div class="card">PM10 Above Threshold: {{ pm10_threshold_count }}</div>
             <div class="card">Actuator Activations: {{ actuator_count }}</div>
         </div>
-<!-- Highest PM2.5 & PM10 Card -->
-<div class="highest-card">
-    <strong>Highest PM2.5:</strong> {{ highest_pm25 }}
-    {% if highest_pm25 != "No Data" %} (Recorded on: {{ highest_pm25_timestamp }}) {% endif %} |
 
-    <strong>Highest PM10:</strong> {{ highest_pm10 }}
-    {% if highest_pm10 != "No Data" %} (Recorded on: {{ highest_pm10_timestamp }}) {% endif %}
-</div>
+        <!-- Highest PM2.5 & PM10 Card -->
+        <div class="highest-card">
 
+            <strong>Highest PM10:</strong> {{ highest_pm10 }}
+            {% if highest_pm10 != "No Data" %} (Recorded on: {{ highest_pm10_timestamp }}) {% endif %}
+        </div>
 
         <!-- Data Tables Side by Side -->
         <div class="data-section">
@@ -53,19 +71,19 @@
                             <th>PM10</th>
                         </tr>
                     </thead>
-         <tbody id="pollution-table">
-    {% for entry in data %}
-    <tr>
-        <td>{{ entry.timestamp }}</td> <!-- Now showing full timestamp -->
-        <td class="{% if entry['PM2.5'] > 100 %}red{% elif entry['PM2.5'] > 80 %}orange{% else %}green{% endif %}">
-            {{ entry['PM2.5'] }}
-        </td>
-        <td class="{% if entry['PM10'] > 150 %}red{% elif entry['PM10'] > 120 %}orange{% else %}green{% endif %}">
-            {{ entry['PM10'] }}
-        </td>
-    </tr>
-    {% endfor %}
-</tbody>
+                    <tbody id="pollution-table">
+                        {% for entry in data %}
+                        <tr>
+                            <td>{{ entry.timestamp }}</td> <!-- Full timestamp -->
+                            <td class="{% if entry['PM2.5'] > 100 %}red{% elif entry['PM2.5'] > 80 %}orange{% else %}green{% endif %}">
+                                {{ entry['PM2.5'] }}
+                            </td>
+                            <td class="{% if entry['PM10'] > 150 %}red{% elif entry['PM10'] > 120 %}orange{% else %}green{% endif %}">
+                                {{ entry['PM10'] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
 
