@@ -4,7 +4,7 @@ import datetime
 
 
 #CLOUD
-MONGO_URI = "mongodb+srv://mytkavish:mytkavish@cluster0.z8s2k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+MONGO_URI = "mongodb+srv://mytkavish:XXXXXXX@cluster0.z8s2k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(MONGO_URI)
 db = client["air_pollution_db"]
 
